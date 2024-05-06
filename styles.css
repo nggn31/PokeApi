@@ -1,0 +1,10 @@
+
+button{
+    background-color:#ffff00;
+    border: none;
+}
+
+button:hover{
+    background-color: #ffc0cb;
+    border: none;
+}
