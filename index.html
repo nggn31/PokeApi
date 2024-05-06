@@ -1,18 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <h1 id="header"></h1>
-    <input type="text" id="nombre" placeholder="Nombre del Pokémon" >
-    <button type="button" id="agregar" >Agregar Pokémon</button>
-    <button type="button" id="mostrarHistorialButton">Mostrar historial</button>
-    <button id="empezarDeNuevo"> Empezar de nuevo</button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>Pokedex</title>
+  </head>
+  <body>
+
+
+
+    <div class="container">
+      <!-- code here -->
+      <div class="card">
+        <div class="card-image">	
+          <h2 class="card-heading">
+            Bienvenido a nuestra pokedex
+          </h2>
+        </div>
+        <form class="card-form">
+          <div class="input">
+            <input type="text" class="input-field"  id="nombre"  required/>
+            <label class="input-label">Nombre del pokemon</label>
+          </div>
+          <div class="action">
+            <button class="action-button" type="button" id="agregar">Agregar Pokémon</button>
+            <a href="historial.html"><button class="action-button" type="button" id="mostrarHistorialButton">Mostrar Historial
+            </button></a> 
+            <button class="action-button" id="empezarDeNuevo">Empezar de nuevo</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <div id="pokemones"></div>
     <div id="historal-container"></div>
     <script src="script.js"></script>
-</body>
+  </body>
 </html>
