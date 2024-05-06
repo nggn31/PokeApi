@@ -1,35 +1,31 @@
 const equipos = [];
+let contador=0;
 
+//Agrega los pokemones
 document.getElementById("agregar").addEventListener("click", async function () {
     const limite = 2;
   
-    const nombrePokemon = document.getElementById("nombre").value.toLowerCase(); //<----------------
+    const nombrePokemon = document.getElementById("nombre").value.toLowerCase(); 
     if (nombrePokemon === "") {
       alert("Error: Tu campo esta vacio");
       return;
     }
-  
-    if (navigator.onLine) {
-      if (await validarNombrePokemon(nombrePokemon)) {
+
+        const pokemon = await obtenerPokemon(nombrePokemon); 
         equipos.push(nombrePokemon);
-        document.getElementById("nombre").value = ""; // Limpiar el campo de entrada
+        contador++;
+        document.getElementById("nombre").value = ""; 
         console.log("Pokémon agregado:", nombrePokemon);
   
-        if (equipos.length > limite) {
+        if (contador > limite) {
           document.getElementById("agregar").disabled = true;
           document.getElementById("nombre").disabled = true;
         }
-      } else {
-        alert("Error: El nombre del Pokémon no es válido");
-      }
-    } else {
-      alert("Error: No cuentas con internet");
-    }
 
     document.getElementById('mostrarHistorialButton').addEventListener('click', mostrarHistorial);
   });
   
-
+//Obtiene los pokemones
 async function obtenerPokemon(nombre) {
   const respuesta = await fetch(`https://pokeapi.co/api/v2/pokemon/${nombre}`);
   return respuesta.json();
@@ -41,66 +37,93 @@ async function validarNombrePokemon(nombre) {
   return respuesta.status === 200;
 }
 
-//Empezar de nuevo
-let refresh = document.getElementById('empezarDeNuevo');
-refresh.addEventListener('click', _ => {
-            location.reload();
+//Valida nombre
+document.getElementById("nombre").addEventListener("blur", async function () {
+  const nombrePokemon = this.value.toLowerCase();
+  if (nombrePokemon === "") {
+      alert("Error: El campo está vacío");
+      return;
+  }
+
+  if (await validarNombrePokemon(nombrePokemon)) {
+      // El nombre del Pokémon es válido
+  } else {
+      alert("Error: El nombre del Pokémon no es válido");
+  }
+});
+  
+// Valida si hay internet
+window.addEventListener('online', function () {
+  if (navigator.onLine) {
+    alert("¡Conexión a Internet restablecida!");
+  } else {
+    alert("El navegador indica que hay conexión a Internet, pero no se puede acceder.");
+  }
+});
+
+window.addEventListener('offline', function () {
+  alert("¡No hay conexión a Internet!");
+});
+
+
+//Boton empezar de nuevo
+document.getElementById('empezarDeNuevo').addEventListener('click', function () {
+  contador = 0; // Reiniciar el contador
+  document.getElementById("agregar").disabled = false; 
+  document.getElementById("nombre").disabled = false; 
 });
 
 
 //Mostrar historial
-function mostrarHistorial() {
+async function mostrarHistorial() {
+  // Checa si hay equipos
   if (equipos.length === 0) {
-    alert('No hay Pokémon agregados aún');
+    alert('No hay equipos agregados aún');
     return;
   }
 
-  // Elementos del historial
+  // Quita los elementos del DOM
+  const existingHistory = document.getElementById('historial-container');
+  if (existingHistory) {
+    existingHistory.remove();
+  }
+
+  // Crea el historial
   const historialContainer = document.createElement('div');
   historialContainer.id = 'historial-container';
 
-  // Titulo
-  const historialTitle = document.createElement('h2');
-  historialTitle.textContent = 'Historial de Pokémon';
-  historialContainer.appendChild(historialTitle);
+  // Titulo de equipos
+  const equipoTitle = document.createElement('h3');
+  equipoTitle.textContent = 'Historial de Equipos';
+  historialContainer.appendChild(equipoTitle);
 
-//Ordenamiento
-  equipos.sort((pokemon1, pokemon2,pokemon3) => {
-    return obtenerPokemon(pokemon1).then(p1 => p1.base_experience) - obtenerPokemon(pokemon2).then(p2 => p2.base_experience)-obtenerPokemon(pokemon3).then(p3 => p3.base_experience);
+  // Fetch para la informacion de los equipos de pokemon
+  const pokemonPromises = equipos.map(async (pokemonName) => {
+    const pokemon = await obtenerPokemon(pokemonName);
+    return pokemon; 
   });
 
-  //Desplega los pookemones anadidos
-  equipos.forEach((pokemonName) => {
+  const pokemonDataArray = await Promise.all(pokemonPromises);
+
+  //Ordena el arreglo
+  pokemonDataArray.sort((a, b) => b.base_experience - a.base_experience);
+
+  pokemonDataArray.forEach((pokemon) => {
     const historialItem = document.createElement('div');
     historialItem.classList.add('historial-item');
 
-    // Informacion del pokemon
-    obtenerPokemon(pokemonName).then(pokemon => {
-      const imagenUrl = pokemon.sprites.front_default;
-      const tipos = pokemon.types.map(type => type.type.name).join(", ");
-      const habilidad = pokemon.abilities.map(ability => ability.ability.name).join(", ");
-      const nombrePokemon = pokemon.name;
-      const idPokemon = pokemon.id;
-      const experiencia = pokemon.base_experience;
+    // Muestra la informacion
+    historialItem.innerHTML = `
+      <img src="${pokemon.sprites.front_default}" alt="${pokemon.name}">
+      <p>Nombre: ${pokemon.name}</p>
+      <p>ID: ${pokemon.id}</p>
+      <p>Tipo(s): ${pokemon.types.map(type => type.type.name).join(", ")}</p>
+      <p>Experiencia base: ${pokemon.base_experience}</p>
+      <p>Habilidad: ${pokemon.abilities[0].ability.name}</p>
+    `;
 
-      historialItem.innerHTML = `
-        <img src="${imagenUrl}" alt="${nombrePokemon}">
-        <p>Nombre: ${nombrePokemon}</p>
-        <p>ID: ${idPokemon}</p>
-        <p>Tipo(s): ${tipos}</p>
-        <p>Experiencia base: ${experiencia}</p>
-        <p>Habilidad: ${habilidad}</p>
-      `;
-
-      historialContainer.appendChild(historialItem);
-    });
+    historialContainer.appendChild(historialItem);
   });
-
-  // Borra si existe allgo en el historial
-  const existenciaHistorial = document.getElementById('historial-container');
-  if (existenciaHistorial) {
-    existingHistory.remove();
-  }
 
   document.body.appendChild(historialContainer);
 }

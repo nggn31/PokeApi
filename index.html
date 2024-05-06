@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
-  </head>
-  <body>
+</head>
+<body>
     <h1 id="header"></h1>
-    <input type="text" id="nombre">
-    <button type="button" id="agregar">Agregar Pokémon</button>
+    <input type="text" id="nombre" placeholder="Nombre del Pokémon" >
+    <button type="button" id="agregar" >Agregar Pokémon</button>
     <button type="button" id="mostrarHistorialButton">Mostrar historial</button>
     <button id="empezarDeNuevo"> Empezar de nuevo</button>
     <div id="pokemones"></div>
     <div id="historal-container"></div>
+    <div id="alerta">
+        <p id="mensaje-alerta"></p>
+    </div>
     <script src="script.js"></script>
- </body>
+</body>
 </html>
